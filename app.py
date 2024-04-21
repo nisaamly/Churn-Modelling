@@ -56,7 +56,7 @@ with open('random_forest_model.pkl', 'rb') as f:
     # Gunakan pickle untuk memuat objek dari file
     loaded_object = pickle.load(f)
 
-# Load LabelEncoder untuk 'Geography' dan 'Gender'
+# Load LabelEncoder untuk 'Gender'
 with open('label_encoder.pkl', 'rb') as label_encoder_file:
     label_encoder = pickle.load(label_encoder_file)
  
@@ -68,7 +68,7 @@ with open('min_max_scaler.pkl', 'rb') as scaler_file:
 if st.button("Prediksi"):
 
     # Mengubah data pengguna menjadi format yang dapat diproses oleh model
-    # Menggunakan LabelEncoder untuk 'Geography' dan 'Gender'
+    # Menggunakan LabelEncoder untuk 'Gender'
     gender_encoded = 1 if Gender == 'Laki-Laki' else 0
 
     # Mengubah data pengguna menjadi DataFrame
