@@ -50,13 +50,13 @@ EstimatedSalary = st.selectbox(
 # Load model yang telah disimpan sebelumnya
 model_filename = 'random_forest_model.pkl'
 loaded_model = pickle.load(model_filename)
+    
+# Buka file model dengan mode baca biner ('rb')
+with open('random_forest_model.pkl', 'rb') as model_filename:
+    # Gunakan pickle untuk memuat model dari file
+    loaded_model = pickle.load(model_filename)
 
-# Buka file dengan mode baca biner ('rb')
-with open('random_forest_model.pkl', 'rb') as f:
-    # Gunakan pickle untuk memuat objek dari file
-    loaded_object = pickle.load(f)
-
-# Load LabelEncoder untuk 'Gender'
+# Load LabelEncoder untuk'Gender'
 with open('label_encoder.pkl', 'rb') as label_encoder_file:
     label_encoder = pickle.load(label_encoder_file)
  
