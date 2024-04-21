@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import sklearn
-import joblib
+import pickle
 
 # Judul halaman
 st.markdown("<h1 style='text-align: center; border-bottom: 2px solid black; padding-bottom: 5px;'>PREDIKSI CHURN</h1>", unsafe_allow_html=True)
@@ -18,8 +17,6 @@ st.markdown("<h5 style='text-align: center; '>SILAHKAN MASUKAN DATA ANDA!</h5>",
 # Input fitur-fitur
 # Credit score
 CreditScore = st.slider("Masukan Jumlah Credit Score Anda!", min_value=250, max_value=900)
-# Domisili
-geography = st.text_input('Domisili', '')
 # Jenis kelamin
 Gender = st.selectbox(
     'Masukan Jenis Kelamin Anda!',
@@ -42,36 +39,54 @@ HasCrCard = st.selectbox(
 IsActiveMember = st.selectbox(
     'Apakah Anda Adalah Pengguna Aktif?',
     ('Ya', 'Tidak'))
-# Gaji tahunan
+# Gaji tahunan 
 EstimatedSalary = st.selectbox(
     'Berapa Perkiraan Gaji Tahunan Anda?',
     ('0', '<10.000.000', '10.000.000 - 20.000.000', '20.000.000 - 30.000.000','>30.000.000'))
-# Kemungkinan churn
-Exited = st.selectbox(
-    'Apakah Anda Berkemungkinan untuk Churn?',
-    ('Ya', 'Tidak'))
+#Exited = st.selectbox(
+  #  'Apakah Anda Berkemungkinan untuk Churn?',
+  #  ('Ya', 'Tidak'))
 
 # Load model yang telah disimpan sebelumnya
-model_filename = 'random_forest_model.joblib'
-loaded_model = joblib.load(model_filename)
+model_filename = 'random_forest_model.pkl'
+loaded_model = pickle.load(model_filename)
+
+# Buka file dengan mode baca biner ('rb')
+with open('random_forest_model.pkl', 'rb') as f:
+    # Gunakan pickle untuk memuat objek dari file
+    loaded_object = pickle.load(f)
+
+# Load LabelEncoder untuk 'Geography' dan 'Gender'
+with open('label_encoder.pkl', 'rb') as label_encoder_file:
+    label_encoder = pickle.load(label_encoder_file)
+ 
+# Load MinMaxScaler untuk penskalaan fitur numerik
+with open('min_max_scaler.pkl', 'rb') as scaler_file:
+    scaler = pickle.load(scaler_file)
 
 # Ketika tombol "Prediksi" ditekan
 if st.button("Prediksi"):
 
     # Mengubah data pengguna menjadi format yang dapat diproses oleh model
+    # Menggunakan LabelEncoder untuk 'Geography' dan 'Gender'
+    gender_encoded = 1 if Gender == 'Laki-Laki' else 0
+
+    # Mengubah data pengguna menjadi DataFrame
     user_data = pd.DataFrame({
         'CreditScore': [CreditScore],
-        'Geography': [geography],
-        'Gender': [Gender],
+        'Gender': [gender_encoded],
         'Age': [Age],
         'Tenure': [Tenure],
         'Balance': [Balance],
-        'NumOfProducts': [NumOfProduct],
+        'NumOfProducts': [int(NumOfProduct)],
         'HasCrCard': [1 if HasCrCard == 'Ya' else 0],
         'IsActiveMember': [1 if IsActiveMember == 'Ya' else 0],
         'EstimatedSalary': [EstimatedSalary],
-        'Exited': [1 if Exited == 'Ya' else 0]
+      #   'Exited': [1 if Exited == 'Ya' else 0]
     })
+
+    # Penskalaan fitur-fitur numerik menggunakan MinMaxScaler
+    user_data_scaled = scaler.transform(user_data)
 
     # Prediksi hasil Status
     hasil_prediksi = loaded_model.predict(user_data)
